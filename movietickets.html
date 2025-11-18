@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CineWave — Book Movie Tickets</title>
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --glass: rgba(255,255,255,0.04);
+      --accent1: #ff4d6d; /* coral */
+      --accent2: #7c5cff; /* purple */
+      --accent3: #00d4ff; /* cyan */
+      --text:#f8fafc;
+      --muted:#98a0b3;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:linear-gradient(180deg,#071226 0%, #071226 40%, #081129 100%); color:var(--text); min-height:100vh}
+
+    /* Header */
+    .topbar{padding:1rem 0;}
+    .brand{display:flex;align-items:center;gap:.6rem;font-weight:700}
+    .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem}
+
+    /* Search */
+    .search-card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border-radius:14px; padding:1rem}
+
+    /* Hero */
+    .hero{padding:2rem 0}
+    .hero .poster{border-radius:14px; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.6)}
+
+    /* Movie cards */
+    .movie-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; overflow:hidden; transition:transform .24s ease, box-shadow .24s ease}
+    .movie-card:hover{transform:translateY(-8px); box-shadow:0 20px 40px rgba(0,0,0,0.5)}
+    .rating-badge{background:linear-gradient(90deg,var(--accent2),var(--accent3)); padding:.25rem .5rem; border-radius:8px; font-weight:700}
+
+    /* Showtimes */
+    .showtime{border-radius:10px;padding:.4rem .7rem;background:linear-gradient(180deg,#0b1320,#071226);border:1px solid rgba(255,255,255,0.03);cursor:pointer}
+    .showtime.active{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#071226}
+
+    /* Seat map */
+    .screen{background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); height:40px;border-radius:8px; display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--muted)}
+    .seat{width:34px;height:34px;border-radius:6px;background:rgba(255,255,255,0.03);display:inline-flex;align-items:center;justify-content:center;margin:6px;cursor:pointer;border:1px solid rgba(255,255,255,0.02)}
+    .seat.selected{background:linear-gradient(90deg,var(--accent2),var(--accent3));color:#071226}
+    .seat.occupied{background:rgba(255,255,255,0.04);opacity:.35;cursor:not-allowed}
+
+    /* Cart & checkout */
+    .cart-card{border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:1rem}
+
+    /* Footer */
+    footer{padding:2rem 0;color:var(--muted);}
+
+    /* Responsive tweaks */
+    @media (max-width:767px){
+      .hero{padding:1rem 0}
+      .seat{width:30px;height:30px;margin:4px}
+    }
+
+    /* playful gradients for sections */
+    .bg-accent{background:linear-gradient(90deg, rgba(124,92,255,0.08), rgba(0,212,255,0.06)); border-radius:12px}
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- TOPBAR -->
+    <header class="topbar d-flex align-items-center justify-content-between">
+      <div class="brand">
+        <div class="logo">C</div>
+        <div>
+          <div style="font-size:1.05rem">CineWave</div>
+          <small style="color:var(--muted)">Your ticket to the best shows</small>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-none d-md-block search-card">
+          <form id="globalSearch" class="d-flex align-items-center gap-2">
+            <input class="form-control form-control-sm bg-transparent border-0 text-white" placeholder="Search movies, theatres, cities...">
+            <button class="btn btn-sm btn-outline-light" type="submit"><i class="bi bi-search"></i></button>
+          </form>
+        </div>
+        <button class="btn btn-sm btn-outline-light d-flex align-items-center gap-2"><i class="bi bi-people-fill"></i> Sign in</button>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero row align-items-center gy-4">
+      <div class="col-lg-7">
+        <div class="bg-accent p-3 rounded-3">
+          <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+              <div class="poster">
+                <img src="https://images.unsplash.com/photo-1517604931442-7c5d3c19e6b7?q=80&w=800&auto=format&fit=crop&s=placeholder" alt="poster" class="img-fluid">
+              </div>
+            </div>
+            <div class="col-md-8 text-white">
+              <h2 style="font-weight:700">New Releases & Blockbusters</h2>
+              <p style="color:var(--muted)">Discover popular films, showtimes, and book your seats in seconds. Colorful UI, fast flow.</p>
+
+              <div class="d-flex gap-2 flex-wrap">
+                <a class="btn btn-lg" style="background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#071226" href="#movies">Browse Movies</a>
+                <a class="btn btn-outline-light btn-lg" href="#showtimes">Showtimes</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="mt-4 d-flex gap-2 flex-wrap">
+          <select class="form-select form-select-sm w-auto">
+            <option>All Genres</option>
+            <option>Action</option>
+            <option>Comedy</option>
+            <option>Drama</option>
+            <option>Horror</option>
+          </select>
+          <select class="form-select form-select-sm w-auto">
+            <option>Select City</option>
+            <option>New Delhi</option>
+            <option>Mumbai</option>
+            <option>Bengaluru</option>
+          </select>
+          <div class="d-flex align-items-center gap-2">
+            <label class="muted small mb-0">Sort:</label>
+            <select class="form-select form-select-sm w-auto">
+              <option>Popular</option>
+              <option>Nearest</option>
+              <option>Price: Low to High</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-lg-5">
+        <div class="card p-3 movie-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+              <div style="font-weight:700">Featured: Galaxy Heist</div>
+              <small class="muted">Sci-fi · 2h 10m</small>
+            </div>
+            <div class="rating-badge">4.7 <i class="bi bi-star-fill ms-1" style="font-size:.9rem"></i></div>
+          </div>
+
+          <p class="muted">An adrenaline-fueled space heist with stunning visuals and a heart-warming core.</p>
+
+          <div class="d-flex gap-2 mt-3 flex-wrap">
+            <button class="btn btn-sm btn-outline-light">Trailer</button>
+            <button class="btn btn-sm" style="background:linear-gradient(90deg,var(--accent3),var(--accent2));color:#071226" data-bs-toggle="modal" data-bs-target="#bookingModal" data-movie="Galaxy Heist">Book Now</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MOVIES GRID -->
+    <section id="movies" class="py-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 style="font-weight:700">Now showing</h3>
+        <small class="muted">Showing 12 movies</small>
+      </div>
+
+      <div class="row g-3">
+        <!-- Movie item (repeatable) -->
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card movie-card p-2">
+            <img src="https://images.unsplash.com/photo-1517604931442-7c5d3c19e6b7?q=80&w=800&auto=format&fit=crop&s=placeholder" class="img-fluid rounded-2" alt="m1">
+            <div class="p-2">
+              <div style="font-weight:700">Galaxy Heist</div>
+              <small class="muted">Sci-fi · 2h 10m</small>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <div class="muted">From ₹199</div>
+                <div>
+                  <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#bookingModal" data-movie="Galaxy Heist">Book</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card movie-card p-2">
+            <img src="https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?q=80&w=800&auto=format&fit=crop&s=placeholder" class="img-fluid rounded-2" alt="m2">
+            <div class="p-2">
+              <div style="font-weight:700">Highway Drift</div>
+              <small class="muted">Action · 2h</small>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <div class="muted">From ₹149</div>
+                <div><button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#bookingModal" data-movie="Highway Drift">Book</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card movie-card p-2">
+            <img src="https://images.unsplash.com/photo-151760096p-unknown?q=80&w=800&auto=format&fit=crop&s=placeholder" class="img-fluid rounded-2" alt="m3">
+            <div class="p-2">
+              <div style="font-weight:700">Romance in Rome</div>
+              <small class="muted">Romance · 1h 50m</small>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <div class="muted">From ₹120</div>
+                <div><button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#bookingModal" data-movie="Romance in Rome">Book</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- add more cards as needed -->
+      </div>
+    </section>
+
+    <!-- SHOWTIME & SEAT PICKER SAMPLE (bottom area) -->
+    <section id="showtimes" class="py-4">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="card p-3 movie-card">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <div style="font-weight:700" id="selectedMovie">Select a movie</div>
+                <small class="muted" id="selectedMeta">Choose showtime & seats</small>
+              </div>
+              <div class="muted">Date: <strong id="todayDate"></strong></div>
+            </div>
+
+            <div class="mt-2">
+              <div class="d-flex gap-2 flex-wrap" id="showtimeList">
+                <!-- showtime buttons inserted by JS -->
+              </div>
+            </div>
+
+            <hr class="my-3">
+
+            <div>
+              <div class="screen mb-3">SCREEN</div>
+              <div id="seatMap" class="p-2" style="background:transparent;border-radius:12px">
+                <!-- seats generated by JS -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="cart-card">
+            <h5 style="font-weight:700">Your Booking</h5>
+            <div class="muted small">Selected seats & summary</div>
+            <hr>
+            <div id="cartList">
+              <div class="muted">No seats selected</div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div style="font-weight:700">Total</div>
+              <div id="totalAmount" style="font-weight:800">₹0</div>
+            </div>
+
+            <div class="d-grid mt-3">
+              <button id="proceedBtn" class="btn btn-lg" style="background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#071226" disabled>Proceed to Pay</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="text-center mt-4">
+      <small>&copy; <span id="year"></span> CineWave — Enjoy the show!</small>
+    </footer>
+
+  </div>
+
+  <!-- BOOKING MODAL (seat selection flow) -->
+  <div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content" style="border-radius:12px;overflow:hidden">
+        <div class="modal-header">
+          <h5 class="modal-title">Book tickets — <span id="modalMovie">Movie</span></h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <p class="muted">Showtimes</p>
+              <div id="modalShowtimes" class="d-flex gap-2 flex-wrap mb-3"></div>
+
+              <p class="muted">Select seats</p>
+              <div class="screen mb-2">SCREEN</div>
+              <div id="modalSeats" class="p-2"></div>
+            </div>
+            <div class="col-md-6">
+              <h6 style="font-weight:700">Booking summary</h6>
+              <div id="modalCart" class="muted small mb-3">No seats selected</div>
+
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <div style="font-weight:700">Total</div>
+                <div id="modalTotal" style="font-weight:800">₹0</div>
+              </div>
+
+              <div class="mt-4">
+                <label class="form-label">Name</label>
+                <input class="form-control" id="buyerName" placeholder="Your name">
+                <label class="form-label mt-2">Email</label>
+                <input class="form-control" id="buyerEmail" placeholder="you@example.com">
+                <div class="d-grid mt-3">
+                  <button id="confirmBooking" class="btn btn-lg" style="background:linear-gradient(90deg,var(--accent3),var(--accent2));color:#071226" disabled>Confirm Booking</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // small demo data
+    const movies = [
+      {title:'Galaxy Heist', duration:'2h 10m', price:199, poster:'https://images.unsplash.com/photo-1517604931442-7c5d3c19e6b7?q=80&w=800&auto=format&fit=crop&s=placeholder'},
+      {title:'Highway Drift', duration:'2h', price:149, poster:'https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?q=80&w=800&auto=format&fit=crop&s=placeholder'},
+      {title:'Romance in Rome', duration:'1h 50m', price:120, poster:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=800&auto=format&fit=crop&s=placeholder'}
+    ];
+
+    // Helper
+    const qs = s=>document.querySelector(s);
+    const qsa = s=>document.querySelectorAll(s);
+
+    // Populate date
+    document.getElementById('todayDate').textContent = new Date().toLocaleDateString();
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Showtimes sample
+    const sampleShowtimes = ['10:00 AM','1:30 PM','4:30 PM','7:30 PM','10:30 PM'];
+
+    // Generate showtime buttons
+    const showtimeList = qs('#showtimeList');
+    function renderShowtimes(){
+      showtimeList.innerHTML = '';
+      sampleShowtimes.forEach((t, i)=>{
+        const btn = document.createElement('button');
+        btn.className='showtime';
+        btn.textContent = t;
+        btn.addEventListener('click', ()=>{
+          qsa('.showtime').forEach(x=>x.classList.remove('active'));
+          btn.classList.add('active');
+        });
+        showtimeList.appendChild(btn);
+      });
+    }
+    renderShowtimes();
+
+    // Seat map generator (8 rows x 10 cols)
+    const seatMap = qs('#seatMap');
+    const modalSeats = qs('#modalSeats');
+    const cartList = qs('#cartList');
+    const totalAmountEl = qs('#totalAmount');
+    let selectedSeats = [];
+
+    function createSeatElement(r,c){
+      const seat = document.createElement('div');
+      seat.className='seat';
+      seat.dataset.row = r; seat.dataset.col = c;
+      seat.textContent = String.fromCharCode(65 + r) + (c+1);
+      // random occupied demo
+      if(Math.random() < 0.12){ seat.classList.add('occupied'); }
+      seat.addEventListener('click', ()=>{
+        if(seat.classList.contains('occupied')) return;
+        const id = seat.dataset.row+"-"+seat.dataset.col;
+        if(seat.classList.contains('selected')){
+          seat.classList.remove('selected');
+          selectedSeats = selectedSeats.filter(s=>s.id!==id);
+        } else {
+          seat.classList.add('selected');
+          selectedSeats.push({id, label:seat.textContent});
+        }
+        updateCart();
+      });
+      return seat;
+    }
+
+    function renderSeats(targetEl){
+      targetEl.innerHTML='';
+      for(let r=0;r<8;r++){
+        const row = document.createElement('div');
+        row.className='d-flex justify-content-center';
+        for(let c=0;c<10;c++){
+          row.appendChild(createSeatElement(r,c));
+        }
+        targetEl.appendChild(row);
+      }
+    }
+    renderSeats(seatMap);
+    renderSeats(modalSeats);
+
+    // update cart
+    function updateCart(){
+      if(selectedSeats.length===0){ cartList.innerHTML = '<div class="muted">No seats selected</div>'; totalAmountEl.textContent = '₹0'; qs('#proceedBtn').disabled = true; return; }
+      cartList.innerHTML = '';
+      const ul = document.createElement('ul'); ul.className='list-unstyled mb-0';
+      let total = 0;
+      selectedSeats.forEach(s=>{
+        const li = document.createElement('li'); li.className='d-flex justify-content-between align-items-center py-1';
+        li.innerHTML = `<div>${s.label}</div><div>₹199 <button class='btn btn-sm btn-link text-danger p-0 ms-2 remove-seat' data-id='${s.id}'>Remove</button></div>`;
+        ul.appendChild(li);
+        total += 199; // static price for demo
+      });
+      cartList.appendChild(ul);
+      totalAmountEl.textContent = '₹'+total;
+      qs('#proceedBtn').disabled = false;
+
+      // remove handlers
+      qsa('.remove-seat').forEach(btn=>{
+        btn.addEventListener('click',(e)=>{
+          const id = btn.dataset.id;
+          selectedSeats = selectedSeats.filter(x=>x.id!==id);
+          // unselect seat visuals
+          qsa('.seat.selected').forEach(el=>{ if(el.dataset.row+'-'+el.dataset.col === id) el.classList.remove('selected'); });
+          updateCart();
+        });
+      });
+    }
+
+    // Booking modal interactions (prefill movie)
+    const bookingModal = document.getElementById('bookingModal');
+    bookingModal.addEventListener('show.bs.modal', function(e){
+      const btn = e.relatedTarget;
+      const movie = btn ? btn.getAttribute('data-movie') : 'Galaxy Heist';
+      qs('#modalMovie').textContent = movie;
+
+      // populate modal showtimes
+      const modalShowtimesEl = qs('#modalShowtimes'); modalShowtimesEl.innerHTML='';
+      sampleShowtimes.forEach(t=>{
+        const b = document.createElement('button'); b.className='showtime'; b.textContent = t; b.addEventListener('click', ()=>{
+          qsa('#modalShowtimes .showtime').forEach(x=>x.classList.remove('active'));
+          b.classList.add('active');
+        });
+        modalShowtimesEl.appendChild(b);
+      });
+
+      // reset modal seats selection
+      selectedSeats = [];
+      renderSeats(modalSeats);
+      qs('#modalCart').textContent = 'No seats selected';
+      qs('#modalTotal').textContent = '₹0';
+      qs('#confirmBooking').disabled = true;
+
+      // when seat clicked in modal seats - update modal cart
+      modalSeats.addEventListener('click', function handler(e){
+        if(!e.target.classList.contains('seat')) return;
+        const selected = Array.from(modalSeats.querySelectorAll('.seat.selected'));
+        if(selected.length===0){ qs('#modalCart').textContent = 'No seats selected'; qs('#modalTotal').textContent = '₹0'; qs('#confirmBooking').disabled = true; }
+        else{
+          const labels = selected.map(s=>s.textContent);
+          qs('#modalCart').textContent = labels.join(', ');
+          qs('#modalTotal').textContent = '₹'+(labels.length*199);
+          qs('#confirmBooking').disabled = false;
+        }
+      });
+
+    });
+
+    // When user confirms booking in modal
+    qs('#confirmBooking').addEventListener('click', ()=>{
+      const name = qs('#buyerName').value || 'Guest';
+      const email = qs('#buyerEmail').value || '';
+      alert('Thanks '+name+'! Your booking is confirmed. A confirmation has been sent to '+(email || 'your email')+'.');
+      const modal = bootstrap.Modal.getInstance(bookingModal);
+      modal.hide();
+    });
+
+    // proceed to pay (mock) from sidebar
+    qs('#proceedBtn').addEventListener('click', ()=>{
+      alert('Proceeding to payment gateway (demo).');
+    });
+
+    // when seats selected on main seatmap update cart display
+    seatMap.addEventListener('click', function(e){
+      if(!e.target.classList.contains('seat')) return;
+      updateCart();
+    });
+
+    // also sync selected movie when Book button on movie grid clicked
+    qsa('[data-movie]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        qs('#selectedMovie').textContent = b.getAttribute('data-movie');
+        qs('#selectedMeta').textContent = 'Choose showtime & seats';
+      });
+    });
+
+  </script>
+</body>
+</html>
